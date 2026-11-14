@@ -192,25 +192,17 @@ const annunciators = (t: Telemetry, masterAt: At, cautionAt: At) => {
 // scales to fit the width ("meet") and hugs the bottom edge, so no gauge is
 // ever cropped. The scene's @media rules show the one that fits the box.
 //
-// Wide: two gauge banks, one on each side of the chat column, which sits over
-// the middle (about x 425 to 1180 here). Each bank: two screens, the alarm
-// lamp above them, a readout beneath.
+// Wide: one row of four screens with the readouts beneath (full window).
 const wideConsole = (t: Telemetry, f: Flight, log: MissionLog) =>
-  `<g class="wide">` +
-  // a full-width deck behind, so the panel reaches both edges at any size
-  `<rect y="60%" width="100%" height="40%" fill="#0b0f13"/>` +
-  // the console, sized by the window's height so it stays inside the area
-  // right of the sidebar
-  `<svg y="60%" width="100%" height="40%" viewBox="0 590 1600 410" preserveAspectRatio="xMidYMax meet" overflow="visible">` +
-  `<path d="M-400 600 L-400 560 Q800 470 2000 560 L2000 600 Z" fill="#0e1317"/>` +
-  `<rect x="-400" y="590" width="2400" height="410" fill="url(#panel)"/>` +
-  `<path d="M-400 596 Q800 506 2000 596" fill="none" stroke="#2a333c" stroke-width="3"/>` +
+  `<svg class="wide" width="100%" height="100%" viewBox="0 590 1600 410" preserveAspectRatio="xMidYMax meet">` +
+  `<path d="M0 600 L0 560 Q800 470 1600 560 L1600 600 Z" fill="#0e1317"/>` +
+  `<rect y="590" width="1600" height="410" fill="url(#panel)"/>` +
+  `<path d="M0 596 Q800 506 1600 596" fill="none" stroke="#2a333c" stroke-width="3"/>` +
+  screens(t, log, [[40, 640], [250, 640], [1160, 640], [1370, 640]]) +
+  flightPanels(f, [40, 790], [1200, 790]) +
   SWITCHES +
-  screens(t, log, [[10, 640], [215, 640], [1195, 640], [1400, 640]]) +
-  flightPanels(f, [10, 790], [1230, 790]) +
-  annunciators(t, [172, 600], [1357, 600]) +
-  `</svg>` +
-  `</g>`
+  annunciators(t, [470, 652], [1060, 652]) +
+  `</svg>`
 
 // Compact: the four screens side by side, the readouts below (sidebar open,
 // a split view, a phone).
@@ -254,16 +246,9 @@ const ASTRONAUT =
   `<path d="M-60 -58 A80 80 0 0 1 -14 -92" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="6" stroke-linecap="round"/>` +
   `</g></g></g>`
 
-// The desktop app's sidebar covers the left of the backdrop, and the chat
-// column is centered in the space right of it. The app doesn't tell a mod
-// whether the sidebar is open, so the cockpit is laid out for it open: the
-// whole scene shifts right by half this width (CSS pixels), which puts the
-// chat at the cockpit's center; the gap it leaves is under the sidebar.
-const SIDEBAR_PX = 300
-
 // The root has no viewBox, so it is exactly the scene's box: the view out the
 // windows is cropped art ("slice"), the console is pinned and never cropped.
-const scene = (t: Telemetry, f: Flight, log: MissionLog, inset: number) =>`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+const scene = (t: Telemetry, f: Flight, log: MissionLog) =>`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
 <defs>
   <radialGradient id="earth" cx="50%" cy="0%" r="90%">
     <stop offset="0" stop-color="#2c6fa8"/><stop offset=".35" stop-color="#174a78"/>
@@ -308,14 +293,11 @@ const scene = (t: Telemetry, f: Flight, log: MissionLog, inset: number) =>`<svg 
   .beacon{animation:bl 1.2s steps(1) infinite}
   .puff{animation:puff 2s ease-out infinite}
   @keyframes puff{0%{opacity:.8}100%{opacity:0}}
-  .shift{transform:translateX(${inset / 2}px)}
-  @media (max-width: 900px){.shift{transform:none}}
   .compact{display:none}
   @media (max-aspect-ratio: 13/10){.wide{display:none}.compact{display:inline}}
   @media (prefers-reduced-motion: reduce){*{animation:none!important}}
 </style>
 <rect width="100%" height="100%" fill="#07090c"/>
-<g class="shift">
 <svg width="100%" height="100%" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
 <rect width="1600" height="1000" fill="#07090c"/>
 <g clip-path="url(#win)">
@@ -335,7 +317,6 @@ const scene = (t: Telemetry, f: Flight, log: MissionLog, inset: number) =>`<svg 
 </svg>
 ${wideConsole(t, f, log)}
 ${compactConsole(t, f, log)}
-</g>
 </svg>`
 
 const LOOK: ThemeSetArgs = {
@@ -411,7 +392,7 @@ export const register: Register = on => {
 
     return (
       <Svg
-        source={scene(t, f, log, e.surface === 'desktop' ? SIDEBAR_PX : 0)}
+        source={scene(t, f, log)}
         alt={`A space shuttle flight deck at orbital night, a space-suited mascot drifting past now and then; its screens show ${modelName(f.model)}, effort, context, cost, turns and the weekly limit`}
         isInteractive
       />
