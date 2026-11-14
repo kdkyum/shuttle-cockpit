@@ -188,21 +188,29 @@ const annunciators = (t: Telemetry, masterAt: At, cautionAt: At) => {
   return lamp(masterAt, master, '#ff4f3f', '#1a0705', 'MASTER') + lamp(cautionAt, caution, '#ffb02e', '#1a1205', 'CAUTION')
 }
 
-// The instrument panel, in two layouts. Each sits in its own nested <svg> that
-// scales to fit the width ("meet") and hugs the bottom edge, so no gauge is
-// ever cropped. The scene's @media rules show the one that fits the box.
+// The instrument panel, in two layouts, shown by the scene's @media rules.
+// Each sits in its own nested <svg> that scales to fit ("meet"), so no gauge
+// is ever cropped.
 //
-// Wide: one row of four screens with the readouts beneath (full window).
+// Wide: the backdrop always spans the whole window and the app's sidebar
+// covers its left edge, while the chat column sits in the middle. So every
+// gauge lives in one stack pinned to the bottom-right corner, which neither
+// covers; the left keeps only the decorative switch deck.
 const wideConsole = (t: Telemetry, f: Flight, log: MissionLog) =>
-  `<svg class="wide" width="100%" height="100%" viewBox="0 590 1600 410" preserveAspectRatio="xMidYMax meet">` +
+  `<g class="wide">` +
+  `<svg width="100%" height="100%" viewBox="0 590 1600 410" preserveAspectRatio="xMidYMax meet">` +
   `<path d="M0 600 L0 560 Q800 470 1600 560 L1600 600 Z" fill="#0e1317"/>` +
   `<rect y="590" width="1600" height="410" fill="url(#panel)"/>` +
   `<path d="M0 596 Q800 506 1600 596" fill="none" stroke="#2a333c" stroke-width="3"/>` +
-  screens(t, log, [[40, 640], [250, 640], [1160, 640], [1370, 640]]) +
-  flightPanels(f, [40, 790], [1200, 790]) +
   SWITCHES +
-  annunciators(t, [470, 652], [1060, 652]) +
-  `</svg>`
+  `</svg>` +
+  `<svg x="70%" y="38%" width="29%" height="60%" viewBox="0 0 404 560" preserveAspectRatio="xMaxYMax meet">` +
+  `<rect x="1" y="1" width="402" height="558" rx="14" fill="#0e1317" stroke="#2a333c" stroke-width="2"/>` +
+  annunciators(t, [120, 10], [214, 10]) +
+  screens(t, log, [[6, 50], [208, 50], [6, 192], [208, 192]]) +
+  flightPanels(f, [22, 336], [22, 452]) +
+  `</svg>` +
+  `</g>`
 
 // Compact: the four screens side by side, the readouts below (sidebar open,
 // a split view, a phone).
