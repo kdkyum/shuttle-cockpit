@@ -1,1 +1,1 @@
-{ "name": "shuttle-cockpit", "version": "0.2.1", "description": "A space shuttle flight deck whose cockpit screens show this session's live Claude Code usage.", "types": "./types/index.d.ts" }
+{ "name": "shuttle-cockpit", "version": "0.2.2", "description": "A space shuttle flight deck whose cockpit screens show this session's live Claude Code usage.", "types": "./types/index.d.ts" }
