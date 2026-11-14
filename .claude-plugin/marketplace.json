@@ -1,0 +1,6 @@
+{
+  "name": "shuttle-cockpit",
+  "description": "A space shuttle cockpit theme for Claude Code with live usage monitors.",
+  "owner": { "name": "kdkyum" },
+  "plugins": [{ "name": "shuttle-cockpit", "source": "./" }]
+}
